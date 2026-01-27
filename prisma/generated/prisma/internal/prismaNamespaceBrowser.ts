@@ -81,6 +81,7 @@ export const UserScalarFieldEnum = {
   image: 'image',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
+  provider_name: 'provider_name',
   role: 'role',
   phone: 'phone',
   status: 'status'

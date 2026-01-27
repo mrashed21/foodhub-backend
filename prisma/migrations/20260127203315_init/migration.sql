@@ -1,12 +1,17 @@
+-- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('customer', 'provider', 'admin');
+
 -- CreateTable
 CREATE TABLE "user" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "emailVerified" BOOLEAN NOT NULL DEFAULT false,
-    "image" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "role" "UserRole" NOT NULL DEFAULT 'customer',
+    "phone" TEXT,
+    "status" TEXT DEFAULT 'active',
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );

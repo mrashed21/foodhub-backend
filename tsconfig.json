@@ -10,7 +10,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@generated/*": ["generated/*"]
+      "@generated/*": ["prisma/generated/*"]
     },
 
     "esModuleInterop": true,
@@ -29,6 +29,6 @@
 
     "skipLibCheck": true
   },
-  "include": ["src/**/*", "generated/**/*"],
+  "include": ["src/**/*", "prisma/generated/**/*"],
   "exclude": ["node_modules", "dist"]
 }

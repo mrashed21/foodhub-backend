@@ -10,15 +10,20 @@ app.use(
   cors({
     origin: process.env.APP_ORIGIN,
     credentials: true,
-  })
+  }),
 );
 
+/*
+//! command
+  npx prisma migrate dev
+  npx prisma generate
+
+*/
 app.use("/api/v1", router);
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.get("/", (req, res) => {
   res.send("FoodHub server is running");
 });
-
 
 export default app;

@@ -29,6 +29,10 @@ export const auth = betterAuth({
         type: "string",
         required: false,
       },
+      provider_name: {
+        type: "string",
+        required: false,
+      },
       status: {
         type: "string",
         defaultValue: "active",
@@ -42,16 +46,16 @@ export const auth = betterAuth({
     requireEmailVerification: true,
   },
   emailVerification: {
-  sendOnSignUp: true,
-  sendVerificationEmail: async ({ user, token }) => {
-    try {
-      const verifyURL = `${process.env.APP_ORIGIN}/verify-email?token=${token}`;
+    sendOnSignUp: true,
+    sendVerificationEmail: async ({ user, token }) => {
+      try {
+        const verifyURL = `${process.env.APP_ORIGIN}/auth/verify-email?token=${token}`;
 
-      await transporter.sendMail({
-        from: '"Food Hub" <no-reply@foodhub.com>',
-        to: user.email,
-        subject: "Food Hub – Verify your email address",
-        html: `
+        await transporter.sendMail({
+          from: '"Food Hub" <no-reply@foodhub.com>',
+          to: user.email,
+          subject: "Food Hub – Verify your email address",
+          html: `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -154,11 +158,10 @@ export const auth = betterAuth({
 </body>
 </html>
         `,
-      });
-    } catch (error) {
-      throw new Error("Failed to send verification email");
-    }
+        });
+      } catch (error) {
+        throw new Error("Failed to send verification email");
+      }
+    },
   },
-},
-
 });
