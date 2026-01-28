@@ -11,7 +11,7 @@ model User {
   provider_name String?
   role          UserRole  @default(customer)
   phone         String?
-  status        String?   @default("active")
+  status        UserStaus @default(activate)
 
   @@unique([email])
   @@map("user")
@@ -65,9 +65,15 @@ model Verification {
   @@map("verification")
 }
 
-// usee role
+//! usee role
 enum UserRole {
   customer
   provider
   admin
+}
+
+// !user status
+enum UserStaus {
+  activate
+  suspend
 }

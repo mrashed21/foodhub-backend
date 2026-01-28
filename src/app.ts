@@ -17,6 +17,8 @@ app.use(
 //! command
   npx prisma migrate dev
   npx prisma generate
+  npx prisma studio
+
 
 */
 app.use("/api/v1", router);
