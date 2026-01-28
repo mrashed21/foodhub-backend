@@ -1,17 +1,18 @@
 model User {
-  id            String    @id @default(uuid())
+  id            String     @id @default(uuid())
   name          String
   email         String
-  emailVerified Boolean   @default(false)
+  emailVerified Boolean    @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
   sessions      Session[]
   accounts      Account[]
   provider_name String?
-  role          UserRole  @default(customer)
+  role          UserRole   @default(customer)
   phone         String?
-  status        UserStaus @default(activate)
+  status        UserStaus  @default(activate)
+  categories    Category[]
 
   @@unique([email])
   @@map("user")

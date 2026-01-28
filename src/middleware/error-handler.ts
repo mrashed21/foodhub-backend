@@ -8,32 +8,50 @@ const errorHandler = (
   next: NextFunction,
 ) => {
   let statusCode = 500;
-  let errorMessage = "Something went wrong";
-  let errorDetails: any = null;
+  let message = "Something went wrong";
+  let error: any = null;
 
-  //! Prisma validation error
+  // Prisma validation error
   if (err instanceof Prisma.PrismaClientValidationError) {
     statusCode = 400;
-    errorMessage = "Invalid data provided";
-    errorDetails = err.message;
+    message = "Invalid data provided";
+    error = err.message;
   }
 
-  //! Prisma known errors (unique, foreign key, etc.)
-  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+  // Prisma known request error
+  else if (err instanceof Prisma.PrismaClientKnownRequestError) {
     statusCode = 400;
-    errorMessage = err.message;
-    errorDetails = err.meta;
+
+    if (err.code === "P2002") {
+      const target = err.meta?.target;
+
+      message = "Duplicate value error";
+
+      if (Array.isArray(target)) {
+        error = `${target.join(", ")} already exists`;
+      } else {
+        error = "Unique field already exists";
+      }
+    } else if (err.code === "P2003") {
+      message = "Invalid reference";
+      error = "Related record not found";
+    } else {
+      message = "Database error";
+      error = err.message;
+    }
   }
 
-  //! Default JS error
-  if (err instanceof Error) {
-    errorDetails = err.message;
+  // Normal JS error
+  else if (err instanceof Error) {
+    statusCode = 400;
+    message = err.message;
+    error = err.message;
   }
 
   res.status(statusCode).json({
     success: false,
-    message: errorMessage,
-    error: errorDetails,
+    message,
+    error,
   });
 };
 

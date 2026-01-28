@@ -1,3 +1,4 @@
+import paginationFuction from "@/helper/pagination-function";
 import { NextFunction, Request, Response } from "express";
 import { categoryService } from "./category.service";
 
@@ -28,6 +29,34 @@ const createCategory = async (
   }
 };
 
+// ! get all categories controller
+const getAllCategories = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { search } = req.query;
+    const searchTerm = typeof search === "string" ? search : undefined;
+
+    const { page, limit, skip } = paginationFuction(req.query);
+    const result = await categoryService.getAllCategories({
+      search: searchTerm,
+      page,
+      limit,
+      skip,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Categories fetched successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 export const categoryController = {
   createCategory,
+  getAllCategories,
 };
