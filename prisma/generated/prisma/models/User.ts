@@ -35,7 +35,7 @@ export type UserMinAggregateOutputType = {
   provider_name: string | null
   role: $Enums.UserRole | null
   phone: string | null
-  status: string | null
+  status: $Enums.UserStaus | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -49,7 +49,7 @@ export type UserMaxAggregateOutputType = {
   provider_name: string | null
   role: $Enums.UserRole | null
   phone: string | null
-  status: string | null
+  status: $Enums.UserStaus | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -194,7 +194,7 @@ export type UserGroupByOutputType = {
   provider_name: string | null
   role: $Enums.UserRole
   phone: string | null
-  status: string | null
+  status: $Enums.UserStaus
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -229,7 +229,7 @@ export type UserWhereInput = {
   provider_name?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   phone?: Prisma.StringNullableFilter<"User"> | string | null
-  status?: Prisma.StringNullableFilter<"User"> | string | null
+  status?: Prisma.EnumUserStausFilter<"User"> | $Enums.UserStaus
   sessions?: Prisma.SessionListRelationFilter
   accounts?: Prisma.AccountListRelationFilter
 }
@@ -245,7 +245,7 @@ export type UserOrderByWithRelationInput = {
   provider_name?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
-  status?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrder
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   accounts?: Prisma.AccountOrderByRelationAggregateInput
 }
@@ -264,7 +264,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   provider_name?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   phone?: Prisma.StringNullableFilter<"User"> | string | null
-  status?: Prisma.StringNullableFilter<"User"> | string | null
+  status?: Prisma.EnumUserStausFilter<"User"> | $Enums.UserStaus
   sessions?: Prisma.SessionListRelationFilter
   accounts?: Prisma.AccountListRelationFilter
 }, "id" | "email">
@@ -280,7 +280,7 @@ export type UserOrderByWithAggregationInput = {
   provider_name?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
-  status?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -300,7 +300,7 @@ export type UserScalarWhereWithAggregatesInput = {
   provider_name?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   role?: Prisma.EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
   phone?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
-  status?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  status?: Prisma.EnumUserStausWithAggregatesFilter<"User"> | $Enums.UserStaus
 }
 
 export type UserCreateInput = {
@@ -314,7 +314,7 @@ export type UserCreateInput = {
   provider_name?: string | null
   role?: $Enums.UserRole
   phone?: string | null
-  status?: string | null
+  status?: $Enums.UserStaus
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
 }
@@ -330,7 +330,7 @@ export type UserUncheckedCreateInput = {
   provider_name?: string | null
   role?: $Enums.UserRole
   phone?: string | null
-  status?: string | null
+  status?: $Enums.UserStaus
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
 }
@@ -346,7 +346,7 @@ export type UserUpdateInput = {
   provider_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumUserStausFieldUpdateOperationsInput | $Enums.UserStaus
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
 }
@@ -362,7 +362,7 @@ export type UserUncheckedUpdateInput = {
   provider_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumUserStausFieldUpdateOperationsInput | $Enums.UserStaus
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -378,7 +378,7 @@ export type UserCreateManyInput = {
   provider_name?: string | null
   role?: $Enums.UserRole
   phone?: string | null
-  status?: string | null
+  status?: $Enums.UserStaus
 }
 
 export type UserUpdateManyMutationInput = {
@@ -392,7 +392,7 @@ export type UserUpdateManyMutationInput = {
   provider_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumUserStausFieldUpdateOperationsInput | $Enums.UserStaus
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -406,7 +406,7 @@ export type UserUncheckedUpdateManyInput = {
   provider_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumUserStausFieldUpdateOperationsInput | $Enums.UserStaus
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -476,6 +476,10 @@ export type EnumUserRoleFieldUpdateOperationsInput = {
   set?: $Enums.UserRole
 }
 
+export type EnumUserStausFieldUpdateOperationsInput = {
+  set?: $Enums.UserStaus
+}
+
 export type UserCreateNestedOneWithoutSessionsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutSessionsInput
@@ -515,7 +519,7 @@ export type UserCreateWithoutSessionsInput = {
   provider_name?: string | null
   role?: $Enums.UserRole
   phone?: string | null
-  status?: string | null
+  status?: $Enums.UserStaus
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
 }
 
@@ -530,7 +534,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   provider_name?: string | null
   role?: $Enums.UserRole
   phone?: string | null
-  status?: string | null
+  status?: $Enums.UserStaus
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -561,7 +565,7 @@ export type UserUpdateWithoutSessionsInput = {
   provider_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumUserStausFieldUpdateOperationsInput | $Enums.UserStaus
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
 }
 
@@ -576,7 +580,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   provider_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumUserStausFieldUpdateOperationsInput | $Enums.UserStaus
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -591,7 +595,7 @@ export type UserCreateWithoutAccountsInput = {
   provider_name?: string | null
   role?: $Enums.UserRole
   phone?: string | null
-  status?: string | null
+  status?: $Enums.UserStaus
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
 }
 
@@ -606,7 +610,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   provider_name?: string | null
   role?: $Enums.UserRole
   phone?: string | null
-  status?: string | null
+  status?: $Enums.UserStaus
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -637,7 +641,7 @@ export type UserUpdateWithoutAccountsInput = {
   provider_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumUserStausFieldUpdateOperationsInput | $Enums.UserStaus
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
 }
 
@@ -652,7 +656,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   provider_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumUserStausFieldUpdateOperationsInput | $Enums.UserStaus
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -781,7 +785,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     provider_name: string | null
     role: $Enums.UserRole
     phone: string | null
-    status: string | null
+    status: $Enums.UserStaus
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1217,7 +1221,7 @@ export interface UserFieldRefs {
   readonly provider_name: Prisma.FieldRef<"User", 'String'>
   readonly role: Prisma.FieldRef<"User", 'UserRole'>
   readonly phone: Prisma.FieldRef<"User", 'String'>
-  readonly status: Prisma.FieldRef<"User", 'String'>
+  readonly status: Prisma.FieldRef<"User", 'UserStaus'>
 }
     
 
