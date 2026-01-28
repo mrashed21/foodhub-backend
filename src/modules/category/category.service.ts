@@ -63,6 +63,20 @@ const getAllCategories = async ({
     where: {
       AND: andConditions,
     },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      isActive: true,
+      createdAt: true,
+      updatedAt: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
   });
 
   // totalData
