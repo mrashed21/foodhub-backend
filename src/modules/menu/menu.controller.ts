@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextFunction, Request, Response } from "express";
 import { menuService } from "./menu.service";
+import paginationFuction from "@/helper/pagination-function";
 
 // //! create menu
 
@@ -44,6 +45,31 @@ const createMenu = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+// ! get all menu
+const getAllMenu = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { search } = req.query;
+    const searchTerm = typeof search === "string" ? search : undefined;
+
+    const { page, limit, skip } = paginationFuction(req.query);
+    const result = await menuService.getAllMenu({
+      search: searchTerm,
+      page,
+      limit,
+      skip,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Menu fetched successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const menuController = {
   createMenu,
+  getAllMenu,
 };
