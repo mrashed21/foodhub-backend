@@ -69,7 +69,62 @@ const getAllMenu = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+// ! get menu for provider (own menus)
+const getMenuByProvider = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const user = req.user;
+
+  if (!user) {
+    return res.status(401).json({ success: false, message: "Unauthorized" });
+  }
+
+  if (user.role !== "provider") {
+    return res.status(403).json({
+      success: false,
+      message: "Only provider can get menu",
+    });
+  }
+
+  try {
+    const provider = await prisma.provider.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!provider) {
+      return res.status(404).json({
+        success: false,
+        message: "Provider profile not found",
+      });
+    }
+
+    const { search } = req.query;
+    const searchTerm = typeof search === "string" ? search : undefined;
+
+    const { page, limit, skip } = paginationFuction(req.query);
+
+    const result = await menuService.getMenuByProvider({
+      providerId: provider.id,
+      search: searchTerm,
+      page,
+      limit,
+      skip,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Menu fetched successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const menuController = {
   createMenu,
   getAllMenu,
+  getMenuByProvider,
 };

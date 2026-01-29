@@ -97,7 +97,85 @@ const getAllMenu = async ({
   };
 };
 
+// ! get menu by provider (with pagination + search)
+const getMenuByProvider = async ({
+  providerId,
+  search,
+  page,
+  limit,
+  skip,
+}: {
+  providerId: string;
+  search: string | undefined;
+  page: number;
+  limit: number;
+  skip: number;
+}) => {
+  const andConditions: MenuWhereInput[] = [];
+
+  andConditions.push({
+    providerId,
+  });
+
+  if (search) {
+    andConditions.push({
+      OR: [
+        {
+          name: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      ],
+    });
+  }
+
+  const data = await prisma.menu.findMany({
+    take: limit,
+    skip,
+    where: {
+      AND: andConditions,
+    },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      price: true,
+      image: true,
+      isAvailable: true,
+      createdAt: true,
+      updatedAt: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const totalData = await prisma.menu.count({
+    where: {
+      AND: andConditions,
+    },
+  });
+
+  return {
+    data,
+    pagination: {
+      totalData,
+      page,
+      limit,
+      totalPage: Math.ceil(totalData / limit),
+    },
+  };
+};
+
 export const menuService = {
   createMenu,
   getAllMenu,
+  getMenuByProvider,
 };
