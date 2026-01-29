@@ -50,6 +50,8 @@ const getAllUsers = async ({
       name: true,
       email: true,
       phone: true,
+      status: true,
+      provider_name: true,
       role: true,
       createdAt: true,
       updatedAt: true,
