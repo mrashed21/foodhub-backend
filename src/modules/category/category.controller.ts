@@ -2,7 +2,7 @@ import paginationFuction from "@/helper/pagination-function";
 import { NextFunction, Request, Response } from "express";
 import { categoryService } from "./category.service";
 
-// ! create category controller
+// ! create category controller 
 const createCategory = async (
   req: Request,
   res: Response,
@@ -75,7 +75,7 @@ const updateCategory = async (
   try {
     const result = await categoryService.updateCategory(req.body, categoryId);
 
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       message: "Category updated successfully",
       data: result,
@@ -103,7 +103,7 @@ const deleteCategory = async (
   try {
     const result = await categoryService.deleteCategory(categoryId);
 
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       message: "Category deleted successfully",
       data: result,
