@@ -4,8 +4,8 @@ import { CategoryWhereInput } from "@generated/prisma/models";
 
 // ! create category service
 const createCategory = async (
-  data: Omit<Category, "id" | "createdAt" | "updatedAt" | "published_by">,
-  published_by: string,
+  data: Omit<Category, "id" | "createdAt" | "updatedAt" | "publishedBy">,
+  publishedBy: string,
 ) => {
   const existing = await prisma.category.findUnique({
     where: { name: data.name },
@@ -18,7 +18,7 @@ const createCategory = async (
   return prisma.category.create({
     data: {
       ...data,
-      published_by,
+      publishedBy,
     },
   });
 };

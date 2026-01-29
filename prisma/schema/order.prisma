@@ -1,0 +1,27 @@
+model Order {
+    id     String @id @default(uuid())
+    userId String @unique
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    menuId String @unique
+
+    orderItems OrderItem[]
+    createdAt  DateTime    @default(now())
+    updatedAt  DateTime    @updatedAt
+    provider   Provider?   @relation(fields: [providerId], references: [id])
+    providerId String?
+}
+
+model OrderItem {
+    id      String @id @default(uuid())
+    orderId String @unique
+    order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+    quantity  Int
+    price     Float
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    providerId String?
+    menu       Menu?   @relation(fields: [menuId], references: [id])
+    menuId     String?
+}

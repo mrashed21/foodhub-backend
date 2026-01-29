@@ -52,7 +52,7 @@ const getAllUsers = async ({
       email: true,
       phone: true,
       status: true,
-      provider_name: true,
+      providerName: true,
       role: true,
       createdAt: true,
       updatedAt: true,

@@ -8,11 +8,14 @@ model User {
   updatedAt     DateTime   @updatedAt
   sessions      Session[]
   accounts      Account[]
-  provider_name String?
+  providerName  String?
   role          UserRole   @default(customer)
   phone         String?
-  status        UserStaus  @default(activate)
+  status        UserStatus @default(activate)
   categories    Category[]
+  order         Order[]
+  provider      Provider?
+  reviews       Review[]
 
   @@unique([email])
   @@map("user")
@@ -66,15 +69,13 @@ model Verification {
   @@map("verification")
 }
 
-//! usee role
 enum UserRole {
+  admin
   customer
   provider
-  admin
 }
 
-// !user status
-enum UserStaus {
+enum UserStatus {
   activate
   suspend
 }

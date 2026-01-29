@@ -22,14 +22,14 @@ export const auth = betterAuth({
     additionalFields: {
       role: {
         type: "string",
-        defaultValue: "user",
+        defaultValue: "customer",
         required: false,
       },
       phone: {
         type: "string",
         required: false,
       },
-      provider_name: {
+      providerName: {
         type: "string",
         required: false,
       },

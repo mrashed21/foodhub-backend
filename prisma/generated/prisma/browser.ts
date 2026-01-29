@@ -42,3 +42,28 @@ export type Verification = Prisma.VerificationModel
  * 
  */
 export type Category = Prisma.CategoryModel
+/**
+ * Model Menu
+ * 
+ */
+export type Menu = Prisma.MenuModel
+/**
+ * Model Order
+ * 
+ */
+export type Order = Prisma.OrderModel
+/**
+ * Model OrderItem
+ * 
+ */
+export type OrderItem = Prisma.OrderItemModel
+/**
+ * Model Provider
+ * 
+ */
+export type Provider = Prisma.ProviderModel
+/**
+ * Model Review
+ * 
+ */
+export type Review = Prisma.ReviewModel
