@@ -97,7 +97,29 @@ const getAllCategories = async ({
   };
 };
 
+// ! update category service
+const updateCategory = async (
+  data: Partial<
+    Omit<Category, "id" | "createdAt" | "updatedAt" | "published_by">
+  >,
+  id: string,
+) => {
+  const existing = await prisma.category.findUnique({
+    where: { id },
+  });
+
+  if (!existing) {
+    throw new Error("Category not found");
+  }
+
+  return prisma.category.update({
+    where: { id },
+    data,
+  });
+};
+
 export const categoryService = {
   createCategory,
   getAllCategories,
+  updateCategory,
 };

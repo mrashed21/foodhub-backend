@@ -14,4 +14,11 @@ router.post(
   categoryController.createCategory,
 );
 
+// update category
+router.patch(
+  "/",
+  authMiddleWare(UserRole.admin),
+  categoryController.updateCategory,
+);
+
 export const categoryRouter = router;

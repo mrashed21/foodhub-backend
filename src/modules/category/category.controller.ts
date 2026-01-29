@@ -56,7 +56,36 @@ const getAllCategories = async (
     next(error);
   }
 };
+
+// ! update category controller
+const updateCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const user = req.user;
+
+  const categoryId = req.body.id;
+  if (!user) {
+    return res.status(500).json({
+      success: false,
+      message: "Unauthorized",
+    });
+  }
+  try {
+    const result = await categoryService.updateCategory(req.body, categoryId);
+
+    res.status(201).json({
+      success: true,
+      message: "Category updated successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 export const categoryController = {
   createCategory,
   getAllCategories,
+  updateCategory,
 };
