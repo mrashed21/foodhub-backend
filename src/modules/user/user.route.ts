@@ -5,5 +5,7 @@ import { userController } from "./user.controller";
 const router = express.Router();
 // ! get all category
 router.get("/", authMiddleWare(UserRole.admin), userController.getAllUsers);
+//! update user status
+router.patch("/", authMiddleWare(UserRole.admin), userController.updateUserStatus);
 
 export const userRouter = router;

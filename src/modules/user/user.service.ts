@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { UserStatus } from "@/types/user-role";
 import { UserRole } from "@generated/prisma/enums";
 import { UserWhereInput } from "@generated/prisma/models";
 
@@ -76,6 +77,17 @@ const getAllUsers = async ({
   };
 };
 
+// ! update user status service
+const updateUserStatus = async (id: string, data: { status: UserStatus }) => {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      status: data.status,
+    },
+  });
+};
+
 export const userService = {
   getAllUsers,
+  updateUserStatus,
 };

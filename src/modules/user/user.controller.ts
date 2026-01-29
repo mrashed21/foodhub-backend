@@ -29,6 +29,35 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+// ! update user status controller
+const updateUserStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id, status } = req.body;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "User id is required",
+      });
+    }
+
+    const result = await userService.updateUserStatus(id, { status });
+
+    res.status(200).json({
+      success: true,
+      message: "User status updated successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const userController = {
   getAllUsers,
+  updateUserStatus,
 };
