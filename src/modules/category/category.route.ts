@@ -14,11 +14,17 @@ router.post(
   categoryController.createCategory,
 );
 
-// update category
+//! update category
 router.patch(
   "/",
   authMiddleWare(UserRole.admin),
   categoryController.updateCategory,
 );
 
+// ! delete category
+router.delete(
+  "/",
+  authMiddleWare(UserRole.admin),
+  categoryController.deleteCategory,
+);
 export const categoryRouter = router;

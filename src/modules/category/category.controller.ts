@@ -84,8 +84,37 @@ const updateCategory = async (
     next(error);
   }
 };
+
+// ! delete category controller
+const deleteCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const user = req.user;
+
+  const categoryId = req.body.id;
+  if (!user) {
+    return res.status(500).json({
+      success: false,
+      message: "Unauthorized",
+    });
+  }
+  try {
+    const result = await categoryService.deleteCategory(categoryId);
+
+    res.status(201).json({
+      success: true,
+      message: "Category deleted successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 export const categoryController = {
   createCategory,
   getAllCategories,
   updateCategory,
+  deleteCategory,
 };

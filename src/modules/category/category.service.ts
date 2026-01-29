@@ -118,8 +118,23 @@ const updateCategory = async (
   });
 };
 
+// ! delete category service
+const deleteCategory = async (id: string) => {
+  const existing = await prisma.category.findUnique({
+    where: { id },
+  });
+
+  if (!existing) {
+    throw new Error("Category not found");
+  }
+
+  return prisma.category.delete({
+    where: { id },
+  });
+};
 export const categoryService = {
   createCategory,
   getAllCategories,
   updateCategory,
+  deleteCategory,
 };
