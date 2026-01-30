@@ -56,6 +56,7 @@ const getAllMenu = async ({
       description: true,
       price: true,
       image: true,
+      cuisine: true,
       isAvailable: true,
       createdAt: true,
       updatedAt: true,
@@ -142,6 +143,7 @@ const getMenuByProvider = async ({
       description: true,
       price: true,
       image: true,
+      cuisine: true,
       isAvailable: true,
       createdAt: true,
       updatedAt: true,
@@ -174,8 +176,54 @@ const getMenuByProvider = async ({
   };
 };
 
+// ! update menu (only owner provider)
+const updateMenu = async (
+  data: Partial<Menu> & { id: string },
+  providerId: string,
+) => {
+  const { id, providerId: _, createdAt, updatedAt, ...updateData } = data;
+
+  const menu = await prisma.menu.findFirst({
+    where: {
+      id,
+      providerId,
+    },
+  });
+
+  if (!menu) {
+    throw new Error("Menu not found or you are not authorized to update");
+  }
+
+  return prisma.menu.update({
+    where: { id },
+    data: updateData,
+  });
+};
+
+// ! delete menu (only owner provider)
+const deleteMenu = async (data: { id: string }, providerId: string) => {
+  const { id } = data;
+
+  const menu = await prisma.menu.findFirst({
+    where: {
+      id,
+      providerId,
+    },
+  });
+
+  if (!menu) {
+    throw new Error("Menu not found or you are not authorized to delete");
+  }
+
+  return prisma.menu.delete({
+    where: { id },
+  });
+};
+
 export const menuService = {
   createMenu,
   getAllMenu,
   getMenuByProvider,
+  updateMenu,
+  deleteMenu,
 };

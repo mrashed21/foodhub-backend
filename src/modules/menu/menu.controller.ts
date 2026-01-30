@@ -1,7 +1,7 @@
+import paginationFuction from "@/helper/pagination-function";
 import { prisma } from "@/lib/prisma";
 import { NextFunction, Request, Response } from "express";
 import { menuService } from "./menu.service";
-import paginationFuction from "@/helper/pagination-function";
 
 // //! create menu
 
@@ -123,8 +123,88 @@ const getMenuByProvider = async (
   }
 };
 
+// ! update menu
+const updateMenu = async (req: Request, res: Response, next: NextFunction) => {
+  const user = req.user;
+
+  if (!user) {
+    return res.status(401).json({ success: false, message: "Unauthorized" });
+  }
+
+  if (user.role !== "provider") {
+    return res.status(403).json({
+      success: false,
+      message: "Only provider can update menu",
+    });
+  }
+
+  try {
+    const provider = await prisma.provider.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!provider) {
+      return res.status(404).json({
+        success: false,
+        message: "Provider profile not found",
+      });
+    }
+
+    const result = await menuService.updateMenu(req.body, provider.id);
+
+    res.status(200).json({
+      success: true,
+      message: "Menu updated successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ! delete menu
+const deleteMenu = async (req: Request, res: Response, next: NextFunction) => {
+  const user = req.user;
+
+  if (!user) {
+    return res.status(401).json({ success: false, message: "Unauthorized" });
+  }
+
+  if (user.role !== "provider") {
+    return res.status(403).json({
+      success: false,
+      message: "Only provider can delete menu",
+    });
+  }
+
+  try {
+    const provider = await prisma.provider.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!provider) {
+      return res.status(404).json({
+        success: false,
+        message: "Provider profile not found",
+      });
+    }
+
+    const result = await menuService.deleteMenu(req.body, provider.id);
+
+    res.status(200).json({
+      success: true,
+      message: "Menu deleted successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const menuController = {
   createMenu,
   getAllMenu,
   getMenuByProvider,
+  updateMenu,
+  deleteMenu,
 };
