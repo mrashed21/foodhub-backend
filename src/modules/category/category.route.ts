@@ -8,6 +8,9 @@ const router = express.Router();
 // ! get all category
 router.get("/", categoryController.getAllCategories);
 
+// ! get all category for admin
+router.get("/admin", authMiddleWare(UserRole.admin), categoryController.getAllCategoriesForAdmin);
+
 //! create category
 router.post(
   "/",

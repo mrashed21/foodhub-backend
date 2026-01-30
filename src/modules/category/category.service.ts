@@ -36,6 +36,83 @@ const getAllCategories = async ({
   skip: number;
 }) => {
   const andConditions: CategoryWhereInput[] = [];
+  andConditions.push({
+    isActive: true,
+  });
+  // search string
+  if (search) {
+    andConditions.push({
+      OR: [
+        {
+          name: {
+            contains: search!,
+            mode: "insensitive",
+          },
+        },
+
+        {
+          slug: {
+            contains: search!,
+            mode: "insensitive",
+          },
+        },
+      ],
+    });
+  }
+
+  const result = await prisma.category.findMany({
+    take: limit,
+    skip,
+    where: {
+      AND: andConditions,
+    },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      isActive: true,
+      createdAt: true,
+      updatedAt: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  // totalData
+  const totaData = await prisma.category.count({
+    where: {
+      AND: andConditions,
+    },
+  });
+
+  return {
+    data: result,
+    pagination: {
+      totaData,
+      page,
+      limit,
+      totalPage: Math.ceil(totaData / limit),
+    },
+  };
+};
+
+//! get category for admin
+const getAllCategoriesForAdmin = async ({
+  search,
+  page,
+  limit,
+  skip,
+}: {
+  search: string | undefined;
+  page: number;
+  limit: number;
+  skip: number;
+}) => {
+  const andConditions: CategoryWhereInput[] = [];
   // search string
   if (search) {
     andConditions.push({
@@ -135,6 +212,7 @@ const deleteCategory = async (id: string) => {
 export const categoryService = {
   createCategory,
   getAllCategories,
+  getAllCategoriesForAdmin,
   updateCategory,
   deleteCategory,
 };

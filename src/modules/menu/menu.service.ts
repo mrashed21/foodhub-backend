@@ -17,9 +17,109 @@ const createMenu = async (
   });
 };
 
-// ! get all menu
-
+// ! get all menu (public)
 const getAllMenu = async ({
+  search,
+  categoryId,
+  priceSort,
+  page,
+  limit,
+  skip,
+}: {
+  search: string | undefined;
+  categoryId: string | undefined;
+  priceSort: string | undefined;
+  page: number;
+  limit: number;
+  skip: number;
+}) => {
+  const andConditions: MenuWhereInput[] = [];
+
+  andConditions.push({
+    isAvailable: true,
+  });
+
+  if (search) {
+    andConditions.push({
+      name: {
+        contains: search,
+        mode: "insensitive",
+      },
+    });
+  }
+
+  if (categoryId) {
+    andConditions.push({
+      categoryId,
+    });
+  }
+
+  let orderBy: any = { createdAt: "desc" };
+
+  if (priceSort === "low_to_high") {
+    orderBy = { price: "asc" };
+  }
+
+  if (priceSort === "high_to_low") {
+    orderBy = { price: "desc" };
+  }
+
+  const data = await prisma.menu.findMany({
+    take: limit,
+    skip,
+    where: {
+      AND: andConditions,
+    },
+    orderBy,
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      price: true,
+      image: true,
+      cuisine: true,
+      isAvailable: true,
+      createdAt: true,
+      updatedAt: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      provider: {
+        select: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              providerName: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const totalData = await prisma.menu.count({
+    where: {
+      AND: andConditions,
+    },
+  });
+
+  return {
+    data,
+    pagination: {
+      totalData,
+      page,
+      limit,
+      totalPage: Math.ceil(totalData / limit),
+    },
+  };
+};
+
+// ! get menu for admin
+const getAdminMenu = async ({
   search,
   categoryId,
   priceSort,
@@ -113,6 +213,47 @@ const getAllMenu = async ({
       totalPage: Math.ceil(totalData / limit),
     },
   };
+};
+
+// ! get single menu (public)
+const getSingleMenu = async (id: string) => {
+  return prisma.menu.findFirst({
+    where: {
+      id,
+      isAvailable: true,
+    },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      price: true,
+      image: true,
+      cuisine: true,
+      isAvailable: true,
+      createdAt: true,
+      updatedAt: true,
+
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+
+      provider: {
+        select: {
+          id: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              providerName: true,
+            },
+          },
+        },
+      },
+    },
+  });
 };
 
 // ! get menu by provider (with pagination + search)
@@ -240,6 +381,8 @@ const deleteMenu = async (data: { id: string }, providerId: string) => {
 export const menuService = {
   createMenu,
   getAllMenu,
+  getAdminMenu,
+  getSingleMenu,
   getMenuByProvider,
   updateMenu,
   deleteMenu,

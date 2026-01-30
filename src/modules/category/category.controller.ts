@@ -57,6 +57,34 @@ const getAllCategories = async (
   }
 };
 
+// ! get all categories for admin controller
+const getAllCategoriesForAdmin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { search } = req.query;
+    const searchTerm = typeof search === "string" ? search : undefined;
+
+    const { page, limit, skip } = paginationFuction(req.query);
+    const result = await categoryService.getAllCategoriesForAdmin({
+      search: searchTerm,
+      page,
+      limit,
+      skip,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Categories fetched successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // ! update category controller
 const updateCategory = async (
   req: Request,
@@ -115,6 +143,7 @@ const deleteCategory = async (
 export const categoryController = {
   createCategory,
   getAllCategories,
+  getAllCategoriesForAdmin,
   updateCategory,
   deleteCategory,
 };
