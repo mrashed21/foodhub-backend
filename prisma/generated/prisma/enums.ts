@@ -24,3 +24,14 @@ export const UserStatus = {
 } as const
 
 export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus]
+
+
+export const OrderStatus = {
+  placed: 'placed',
+  preparing: 'preparing',
+  ready: 'ready',
+  delivered: 'delivered',
+  cancelled: 'cancelled'
+} as const
+
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
