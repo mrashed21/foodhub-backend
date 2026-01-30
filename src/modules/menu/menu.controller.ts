@@ -48,12 +48,17 @@ const createMenu = async (req: Request, res: Response, next: NextFunction) => {
 // ! get all menu
 const getAllMenu = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { search } = req.query;
+    const { search, category, priceRange } = req.query;
+
     const searchTerm = typeof search === "string" ? search : undefined;
+    const categoryId = typeof category === "string" ? category : undefined;
+    const priceSort = typeof priceRange === "string" ? priceRange : undefined;
 
     const { page, limit, skip } = paginationFuction(req.query);
     const result = await menuService.getAllMenu({
       search: searchTerm,
+      categoryId,
+      priceSort,
       page,
       limit,
       skip,

@@ -18,38 +18,56 @@ const createMenu = async (
 };
 
 // ! get all menu
+
 const getAllMenu = async ({
   search,
+  categoryId,
+  priceSort,
   page,
   limit,
   skip,
 }: {
   search: string | undefined;
+  categoryId: string | undefined;
+  priceSort: string | undefined;
   page: number;
   limit: number;
   skip: number;
 }) => {
   const andConditions: MenuWhereInput[] = [];
-  // search string
+
   if (search) {
     andConditions.push({
-      OR: [
-        {
-          name: {
-            contains: search!,
-            mode: "insensitive",
-          },
-        },
-      ],
+      name: {
+        contains: search,
+        mode: "insensitive",
+      },
     });
   }
 
-  const result = await prisma.menu.findMany({
+  if (categoryId) {
+    andConditions.push({
+      categoryId,
+    });
+  }
+
+  let orderBy: any = { createdAt: "desc" };
+
+  if (priceSort === "low_to_high") {
+    orderBy = { price: "asc" };
+  }
+
+  if (priceSort === "high_to_low") {
+    orderBy = { price: "desc" };
+  }
+
+  const data = await prisma.menu.findMany({
     take: limit,
     skip,
     where: {
       AND: andConditions,
     },
+    orderBy,
     select: {
       id: true,
       name: true,
@@ -80,20 +98,19 @@ const getAllMenu = async ({
     },
   });
 
-  // totalData
-  const totaData = await prisma.menu.count({
+  const totalData = await prisma.menu.count({
     where: {
       AND: andConditions,
     },
   });
 
   return {
-    data: result,
+    data,
     pagination: {
-      totaData,
+      totalData,
       page,
       limit,
-      totalPage: Math.ceil(totaData / limit),
+      totalPage: Math.ceil(totalData / limit),
     },
   };
 };
