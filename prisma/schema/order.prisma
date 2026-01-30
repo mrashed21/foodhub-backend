@@ -12,8 +12,8 @@ model Order {
 
     totalAmount Float
     status      OrderStatus @default(placed)
-
-    orderItems OrderItem[]
+    invoice     String?     @unique
+    orderItems  OrderItem[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

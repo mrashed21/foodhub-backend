@@ -8,9 +8,15 @@ type OrderPayloadItem = {
   price: number;
 };
 
-/* =========================
-   CREATE ORDER (CUSTOMER)
-========================= */
+const generateInvoice = () => {
+  const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+
+  const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+  return `ORD-${date}-${random}`;
+};
+
+//! CREATE ORDER (CUSTOMER)
 const createOrder = async (
   userId: string,
   payload: {
@@ -24,8 +30,6 @@ const createOrder = async (
   if (!items?.length) {
     throw new Error("Order items are required");
   }
-
-  /* 1️⃣ Fetch menus with providerId */
   const menus = await prisma.menu.findMany({
     where: {
       id: { in: items.map((i) => i.menuId) },
@@ -40,10 +44,8 @@ const createOrder = async (
     throw new Error("Invalid menu detected");
   }
 
-  /* 2️⃣ Build menuId → providerId map */
   const menuProviderMap = new Map(menus.map((m) => [m.id, m.providerId]));
 
-  /* 3️⃣ Group items by provider */
   const providerMap = new Map<
     string,
     (OrderPayloadItem & { providerId: string })[]
@@ -51,7 +53,6 @@ const createOrder = async (
 
   for (const item of items) {
     const providerId = menuProviderMap.get(item.menuId);
-
     if (!providerId) {
       throw new Error(`Provider not found for menuId: ${item.menuId}`);
     }
@@ -65,7 +66,6 @@ const createOrder = async (
 
   const createdOrders = [];
 
-  /* 4️⃣ Create orders per provider */
   for (const [providerId, providerItems] of providerMap.entries()) {
     const totalAmount = providerItems.reduce(
       (sum, i) => sum + i.price * i.quantity,
@@ -74,6 +74,7 @@ const createOrder = async (
 
     const order = await prisma.order.create({
       data: {
+        invoice: generateInvoice(),
         phone,
         address,
         totalAmount,
@@ -106,9 +107,7 @@ const createOrder = async (
   return createdOrders;
 };
 
-/* =========================
-   CUSTOMER ORDERS
-========================= */
+//!  CUSTOMER ORDERS
 const getMyOrders = async (
   userId: string,
   {
@@ -130,6 +129,7 @@ const getMyOrders = async (
       OR: [
         { phone: { contains: search, mode: "insensitive" } },
         { address: { contains: search, mode: "insensitive" } },
+        { invoice: { contains: search, mode: "insensitive" } },
       ],
     });
   }
@@ -147,6 +147,7 @@ const getMyOrders = async (
       id: true,
       phone: true,
       address: true,
+      invoice: true,
       totalAmount: true,
       status: true,
       createdAt: true,
@@ -196,9 +197,7 @@ const getMyOrders = async (
   };
 };
 
-/* =========================
-   ORDER DETAILS (ALL ROLES)
-========================= */
+//!ORDER DETAILS (ALL ROLES)
 
 const getOrderDetails = async (orderId: string, user: any) => {
   const order = await prisma.order.findUnique({
