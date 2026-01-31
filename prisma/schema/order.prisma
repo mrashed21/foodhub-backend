@@ -14,6 +14,7 @@ model Order {
     status      OrderStatus @default(placed)
     invoice     String?     @unique
     orderItems  OrderItem[]
+    review      Review[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

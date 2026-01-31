@@ -11,13 +11,18 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
 
     const { page, limit, skip } = paginationFuction(req.query);
 
-    const result = await userService.getAllUsers({
-      search: searchTerm,
+    const params = {
       page,
       limit,
       skip,
       role: req.query.role as UserRole,
-    });
+    };
+
+    if (searchTerm) {
+      Object.assign(params, { search: searchTerm });
+    }
+
+    const result = await userService.getAllUsers(params);
 
     res.status(201).json({
       success: true,

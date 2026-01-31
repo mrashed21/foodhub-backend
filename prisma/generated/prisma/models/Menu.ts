@@ -516,11 +516,6 @@ export type MenuScalarRelationFilter = {
   isNot?: Prisma.MenuWhereInput
 }
 
-export type MenuNullableScalarRelationFilter = {
-  is?: Prisma.MenuWhereInput | null
-  isNot?: Prisma.MenuWhereInput | null
-}
-
 export type MenuCreateNestedManyWithoutCategoryInput = {
   create?: Prisma.XOR<Prisma.MenuCreateWithoutCategoryInput, Prisma.MenuUncheckedCreateWithoutCategoryInput> | Prisma.MenuCreateWithoutCategoryInput[] | Prisma.MenuUncheckedCreateWithoutCategoryInput[]
   connectOrCreate?: Prisma.MenuCreateOrConnectWithoutCategoryInput | Prisma.MenuCreateOrConnectWithoutCategoryInput[]
@@ -642,12 +637,10 @@ export type MenuCreateNestedOneWithoutReviewsInput = {
   connect?: Prisma.MenuWhereUniqueInput
 }
 
-export type MenuUpdateOneWithoutReviewsNestedInput = {
+export type MenuUpdateOneRequiredWithoutReviewsNestedInput = {
   create?: Prisma.XOR<Prisma.MenuCreateWithoutReviewsInput, Prisma.MenuUncheckedCreateWithoutReviewsInput>
   connectOrCreate?: Prisma.MenuCreateOrConnectWithoutReviewsInput
   upsert?: Prisma.MenuUpsertWithoutReviewsInput
-  disconnect?: Prisma.MenuWhereInput | boolean
-  delete?: Prisma.MenuWhereInput | boolean
   connect?: Prisma.MenuWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.MenuUpdateToOneWithWhereWithoutReviewsInput, Prisma.MenuUpdateWithoutReviewsInput>, Prisma.MenuUncheckedUpdateWithoutReviewsInput>
 }
