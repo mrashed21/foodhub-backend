@@ -5,18 +5,18 @@ import { orderController } from "./order.controller";
 
 const router = Router();
 
-//! Provider orders list (+ search)
-router.get(
-  "/provider",
-  authMiddleWare(UserRole.provider),
-  orderController.getOrdersForProvider,
-);
-
 //! get all order for admin
 router.get(
   "/admin",
   authMiddleWare(UserRole.admin),
   orderController.getAllOrdersForAdmin,
+);
+
+//! Provider orders list (+ search)
+router.get(
+  "/provider",
+  authMiddleWare(UserRole.provider),
+  orderController.getOrdersForProvider,
 );
 
 //!Get logged-in user's orders

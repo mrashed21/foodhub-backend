@@ -220,10 +220,7 @@ const getOrderDetails = async (orderId: string, user: any) => {
   return order;
 };
 
-/* =========================
-   PROVIDER ORDERS + SEARCH
-========================= */
-
+//!PROVIDER ORDERS + SEARCH
 const isValidOrderStatus = (value: string): value is OrderStatus => {
   return Object.values(OrderStatus).includes(value as OrderStatus);
 };
@@ -341,9 +338,7 @@ const getOrdersForProvider = async (
   };
 };
 
-/* =========================
-   UPDATE / CANCEL ORDER
-========================= */
+//! UPDATE / CANCEL ORDER
 
 const updateOrderStatus = async (
   payload: {
@@ -396,20 +391,135 @@ const updateOrderStatus = async (
   });
 };
 
-// get all order dfor admin
-const getAllOrdersForAdmin = async () => {
-  return prisma.order.findMany({
-    include: {
-      orderItems: {
-        include: { menu: true },
-      },
-      provider: {
-        include: { user: true },
-      },
-      user: true,
+//! get all order dfor admin
+
+export const getAllOrdersForAdmin = async (
+  user: any,
+  query: {
+    page: number;
+    limit: number;
+    skip: number;
+    search?: string;
+    status?: string;
+    provider?: string;
+  },
+) => {
+  if (user.role !== UserRole.admin) {
+    throw new Error("Unauthorized");
+  }
+
+  const { page, limit, skip, search, status, provider } = query;
+
+  const andConditions: any[] = [];
+
+  if (search) {
+    andConditions.push({
+      OR: [
+        {
+          invoice: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          user: {
+            name: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        },
+        {
+          user: {
+            email: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        },
+      ],
+    });
+  }
+
+  if (status) {
+    if (!isValidOrderStatus(status)) {
+      throw new Error("Invalid order status");
+    }
+
+    andConditions.push({
+      status: status as OrderStatus,
+    });
+  }
+
+  if (provider) {
+    andConditions.push({
+      providerId: provider,
+    });
+  }
+
+  const data = await prisma.order.findMany({
+    where: {
+      AND: andConditions,
     },
-    orderBy: { createdAt: "desc" },
+    take: limit,
+    skip,
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      id: true,
+      invoice: true,
+      status: true,
+      totalAmount: true,
+      createdAt: true,
+
+      provider: {
+        select: {
+          id: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              providerName: true,
+            },
+          },
+        },
+      },
+
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+
+      orderItems: {
+        select: {
+          id: true,
+          quantity: true,
+          price: true,
+        },
+      },
+    },
   });
+
+  const totalData = await prisma.order.count({
+    where: {
+      AND: andConditions,
+    },
+  });
+
+  return {
+    data,
+    pagination: {
+      page,
+      limit,
+      totalData,
+      totalPage: Math.ceil(totalData / limit),
+    },
+  };
 };
 
 export const orderService = {

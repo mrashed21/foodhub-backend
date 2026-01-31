@@ -108,9 +108,7 @@ const getOrderDetails = async (
   }
 };
 
-/**
- * provider order list
- */
+//! provider order list
 
 const getOrdersForProvider = async (
   req: Request,
@@ -194,13 +192,53 @@ const updateOrderStatus = async (
 };
 
 // ! get all order for admin
-const getAllOrdersForAdmin = async (
+
+export const getAllOrdersForAdmin = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
+  const user = req.user;
+
+  if (!user) {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized",
+    });
+  }
+
   try {
-    const result = await orderService.getAllOrdersForAdmin();
+    const { search, status, provider } = req.query;
+
+    const { page, limit, skip } = paginationFuction(req.query);
+
+    const params: {
+      page: number;
+      limit: number;
+      skip: number;
+      search?: string;
+      status?: string;
+      provider?: string;
+    } = {
+      page,
+      limit,
+      skip,
+    };
+
+    if (typeof search === "string") {
+      params.search = search;
+    }
+
+    if (typeof status === "string") {
+      params.status = status;
+    }
+
+    if (typeof provider === "string") {
+      params.provider = provider;
+    }
+
+    const result = await orderService.getAllOrdersForAdmin(user, params);
+
     res.status(200).json({
       success: true,
       data: result,
@@ -209,6 +247,7 @@ const getAllOrdersForAdmin = async (
     next(error);
   }
 };
+
 export const orderController = {
   createOrder,
   getMyOrders,
