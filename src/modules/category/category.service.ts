@@ -72,6 +72,7 @@ const getAllCategories = async ({
       slug: true,
       isActive: true,
       createdAt: true,
+      categoryImage: true,
       updatedAt: true,
       user: {
         select: {

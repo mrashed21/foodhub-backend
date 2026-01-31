@@ -250,6 +250,22 @@ const getSingleMenu = async (id: string) => {
           },
         },
       },
+
+      reviews: {
+        select: {
+          id: true,
+          rating: true,
+          comment: true,
+          createdAt: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+      },
     },
   });
 };
