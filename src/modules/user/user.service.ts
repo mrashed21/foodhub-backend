@@ -3,7 +3,7 @@ import { UserStatus } from "@/types/user-role";
 import { UserRole } from "@generated/prisma/enums";
 import { UserWhereInput } from "@generated/prisma/models";
 
-// !get all user service and ,page, limit, search user role,role will be dynamic
+// ! get all users (role dynamic) + providerId for providers
 const getAllUsers = async ({
   search,
   page,
@@ -11,27 +11,27 @@ const getAllUsers = async ({
   skip,
   role,
 }: {
-  search: string | undefined;
+  search?: string;
   page: number;
   limit: number;
   skip: number;
   role: UserRole;
 }) => {
   const andConditions: UserWhereInput[] = [];
-  // search string
+
+  //  search
   if (search) {
     andConditions.push({
       OR: [
         {
           name: {
-            contains: search!,
+            contains: search,
             mode: "insensitive",
           },
         },
-
         {
           email: {
-            contains: search!,
+            contains: search,
             mode: "insensitive",
           },
         },
@@ -56,23 +56,33 @@ const getAllUsers = async ({
       role: true,
       createdAt: true,
       updatedAt: true,
+
+      provider: {
+        select: {
+          id: true,
+        },
+      },
     },
   });
 
-  // totalData
-  const totaData = await prisma.user.count({
+  const totalData = await prisma.user.count({
     where: {
       role,
+      AND: andConditions,
     },
   });
 
   return {
-    data: users,
+    data: users.map((user) => ({
+      ...user,
+      providerId: user.provider?.id ?? null,
+      provider: undefined,
+    })),
     pagination: {
-      totaData,
+      totalData,
       page,
       limit,
-      totalPage: Math.ceil(totaData / limit),
+      totalPage: Math.ceil(totalData / limit),
     },
   };
 };
