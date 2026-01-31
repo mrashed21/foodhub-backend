@@ -217,14 +217,6 @@ const getOrderDetails = async (orderId: string, user: any) => {
     throw new Error("Order not found");
   }
 
-  if (user.role === UserRole.customer && order.userId !== user.id) {
-    throw new Error("Unauthorized access");
-  }
-
-  if (user.role === UserRole.provider && order.providerId !== user.providerId) {
-    throw new Error("Unauthorized access");
-  }
-
   return order;
 };
 
@@ -232,7 +224,20 @@ const getOrderDetails = async (orderId: string, user: any) => {
    PROVIDER ORDERS + SEARCH
 ========================= */
 
-const getOrdersForProvider = async (user: any, query: any) => {
+const isValidOrderStatus = (value: string): value is OrderStatus => {
+  return Object.values(OrderStatus).includes(value as OrderStatus);
+};
+
+const getOrdersForProvider = async (
+  user: any,
+  query: {
+    page: number;
+    limit: number;
+    skip: number;
+    search?: string;
+    status?: string;
+  },
+) => {
   const provider = await prisma.provider.findUnique({
     where: { userId: user.id },
   });
@@ -241,40 +246,99 @@ const getOrdersForProvider = async (user: any, query: any) => {
     throw new Error("Provider not found");
   }
 
-  const { search } = query;
+  const { page, limit, skip, search, status } = query;
 
-  return prisma.order.findMany({
+  const andConditions: any[] = [{ providerId: provider.id }];
+
+  if (search) {
+    andConditions.push({
+      OR: [
+        {
+          invoice: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          user: {
+            name: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        },
+        {
+          user: {
+            email: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        },
+      ],
+    });
+  }
+
+  if (status) {
+    if (!isValidOrderStatus(status)) {
+      throw new Error("Invalid order status");
+    }
+
+    andConditions.push({
+      status: status as OrderStatus,
+    });
+  }
+
+  const data = await prisma.order.findMany({
     where: {
-      providerId: provider.id,
-      ...(search && {
-        OR: [
-          { id: { contains: search } },
-          { status: search as OrderStatus },
-          {
-            user: {
-              name: {
-                contains: search,
-                mode: "insensitive",
-              },
-            },
-          },
-          {
-            user: {
-              email: {
-                contains: search,
-                mode: "insensitive",
-              },
-            },
-          },
-        ],
-      }),
+      AND: andConditions,
     },
-    include: {
-      user: true,
-      orderItems: true,
+    take: limit,
+    skip,
+    orderBy: {
+      createdAt: "desc",
     },
-    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      invoice: true,
+      status: true,
+      totalAmount: true,
+      createdAt: true,
+      providerId: true,
+      provider: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+
+      orderItems: {
+        select: {
+          id: true,
+          quantity: true,
+          price: true,
+        },
+      },
+    },
   });
+
+  const totalData = await prisma.order.count({
+    where: {
+      AND: andConditions,
+    },
+  });
+
+  return {
+    data,
+    pagination: {
+      page,
+      limit,
+      totalData,
+      totalPage: Math.ceil(totalData / limit),
+    },
+  };
 };
 
 /* =========================
@@ -282,43 +346,53 @@ const getOrdersForProvider = async (user: any, query: any) => {
 ========================= */
 
 const updateOrderStatus = async (
-  orderId: string,
-  status: OrderStatus,
+  payload: {
+    id: string;
+    status: OrderStatus;
+  },
   user: any,
 ) => {
   const order = await prisma.order.findUnique({
-    where: { id: orderId },
+    where: { id: payload.id },
   });
 
   if (!order) {
     throw new Error("Order not found");
   }
 
-  // customer cancel rule
+  //* customer rules
   if (user.role === UserRole.customer) {
     if (order.userId !== user.id) {
       throw new Error("Unauthorized");
     }
 
-    if (order.status !== OrderStatus.placed) {
+    if (
+      order.status !== OrderStatus.placed &&
+      order.status !== OrderStatus.preparing
+    ) {
       throw new Error("Order can no longer be cancelled");
     }
 
-    if (status !== OrderStatus.cancelled) {
+    if (payload.status !== OrderStatus.cancelled) {
       throw new Error("Invalid action");
     }
   }
 
-  // provider rule
+  //* provider rules
   if (user.role === UserRole.provider) {
-    if (order.providerId !== user.providerId) {
+    const provider = await prisma.provider.findUnique({
+      where: { id: order.providerId },
+      select: { userId: true },
+    });
+
+    if (!provider || provider.userId !== user.id) {
       throw new Error("Unauthorized");
     }
   }
 
   return prisma.order.update({
-    where: { id: orderId },
-    data: { status },
+    where: { id: payload.id },
+    data: { status: payload.status },
   });
 };
 

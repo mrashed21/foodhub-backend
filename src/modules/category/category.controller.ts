@@ -2,7 +2,7 @@ import paginationFuction from "@/helper/pagination-function";
 import { NextFunction, Request, Response } from "express";
 import { categoryService } from "./category.service";
 
-// ! create category controller 
+// ! create category controller
 const createCategory = async (
   req: Request,
   res: Response,
