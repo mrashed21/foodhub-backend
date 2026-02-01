@@ -17,7 +17,28 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
-  trustedOrigins: [process.env.APP_ORIGIN!],
+  trustedOrigins: [
+    process.env.APP_ORIGIN!,
+    "https://foodhub-frontend-flame.vercel.app",
+  ],
+
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 7 * 24 * 60 * 60, 
+    },
+  },
+
+  advanced: {
+    useSecureCookies: true, 
+    crossSubDomainCookies: {
+      enabled: true,
+    },
+  },
+
+  baseURL:
+    process.env.BETTER_AUTH_URL || "https://foodhub-backend-pearl.vercel.app",
+
   user: {
     additionalFields: {
       role: {
@@ -165,3 +186,7 @@ export const auth = betterAuth({
     },
   },
 });
+
+//
+// GOOGLE_CLIENT_ID
+// GOOGLE_CLIENT_SECRET
