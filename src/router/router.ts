@@ -1,6 +1,7 @@
 import { categoryRouter } from "@/modules/category/category.route";
 import { menuRouter } from "@/modules/menu/menu.route";
 import { orderRouter } from "@/modules/order/order.route";
+import { providerRouter } from "@/modules/provider/provider.route";
 import { reviewRouter } from "@/modules/review/review.route";
 import { userRouter } from "@/modules/user/user.route";
 import { Router } from "express";
@@ -21,5 +22,8 @@ router.use("/order", orderRouter);
 
 // review router
 router.use("/review", reviewRouter);
+
+// provider router
+router.use("/provider", providerRouter);
 
 export default router;
