@@ -25,12 +25,12 @@ export const auth = betterAuth({
   session: {
     cookieCache: {
       enabled: true,
-      maxAge: 7 * 24 * 60 * 60, 
+      maxAge: 7 * 24 * 60 * 60,
     },
   },
 
   advanced: {
-    useSecureCookies: true, 
+    useSecureCookies: true,
     crossSubDomainCookies: {
       enabled: true,
     },
@@ -186,7 +186,3 @@ export const auth = betterAuth({
     },
   },
 });
-
-//
-// GOOGLE_CLIENT_ID
-// GOOGLE_CLIENT_SECRET

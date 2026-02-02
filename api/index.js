@@ -2574,7 +2574,7 @@ var app = express7();
 app.use(express7.json());
 app.use(
   cors({
-    origin: process.env.APP_ORIGIN || "http://localhost:3000",
+    origin: process.env.APP_ORIGIN,
     credentials: true
   })
 );
