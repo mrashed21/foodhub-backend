@@ -12,8 +12,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://foodhub-frontend-flame.vercel.app",
-      process.env.APP_ORIGIN!,
+      "https://frontend-foodhub-mrashed21.vercel.app",
     ],
     credentials: true,
   }),
@@ -24,11 +23,11 @@ app.use(
   npx prisma migrate dev
   npx prisma generate
   npx prisma studio
-
+https://backend-foodhub-mrashed21.vercel.app
 
 */
-app.use("/api/v1", router);
 app.all("/api/auth/*splat", toNodeHandler(auth));
+app.use("/api/v1", router);
 
 app.get("/", (req, res) => {
   res.send("FoodHub server is running");
@@ -37,6 +36,5 @@ app.get("/", (req, res) => {
 app.use(notFound);
 // global error
 app.use(errorHandler);
-
 
 export default app;
