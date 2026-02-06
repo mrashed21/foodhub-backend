@@ -17,23 +17,34 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
-  trustedOrigins: ["https://frontend-foodhub-mrashed21.vercel.app"],
+  // trustedOrigins: ["https://frontend-foodhub-mrashed21.vercel.app"],
 
-  session: {
-    cookieCache: {
-      enabled: true,
-      maxAge: 7 * 24 * 60 * 60,
-    },
-    cookie: {
-      domain: ".foodhub.mrashed21.vercel.app",
-      sameSite: "none",
-      secure: true,
-      httpOnly: true,
-      path: "/",
-    },
+  trustedOrigins: async (request) => {
+    const origin = request?.headers.get("origin");
+
+    const allowedOrigins = [
+      process.env.APP_URL,
+      process.env.BETTER_AUTH_URL,
+      "http://localhost:3000",
+      "http://localhost:4000",
+      "http://localhost:5000",
+      "https://frontend-foodhub-mrashed21.vercel.app",
+      "https://backend-foodhub-mrashed21.vercel.app",
+    ].filter(Boolean);
+
+    // Check if origin matches allowed origins or Vercel pattern
+    if (
+      !origin ||
+      allowedOrigins.includes(origin) ||
+      /^https:\/\/.*\.vercel\.app$/.test(origin)
+    ) {
+      return [origin];
+    }
+
+    return [];
   },
 
-  baseURL: "https://backend-foodhub-mrashed21.vercel.app",
+  basePath: "/api/auth",
 
   user: {
     additionalFields: {
@@ -179,6 +190,27 @@ export const auth = betterAuth({
       } catch (error) {
         throw new Error("Failed to send verification email");
       }
+    },
+  },
+
+  advanced: {
+    defaultCookieAttributes: {
+      sameSite: "none",
+      secure: true,
+      httpOnly: true,
+      //extra
+      path: "/",
+    },
+    trustProxy: true,
+    cookies: {
+      state: {
+        attributes: {
+          sameSite: "none",
+          secure: true,
+          // extra
+          path: "/",
+        },
+      },
     },
   },
 });

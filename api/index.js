@@ -7,7 +7,7 @@ var __export = (target, all) => {
 // src/app.ts
 import { toNodeHandler } from "better-auth/node";
 import cors from "cors";
-import express7 from "express";
+import express8 from "express";
 
 // src/lib/auth.ts
 import { betterAuth } from "better-auth";
@@ -288,7 +288,24 @@ var auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql"
   }),
-  trustedOrigins: [process.env.APP_ORIGIN],
+  // trustedOrigins: ["https://frontend-foodhub-mrashed21.vercel.app"],
+  trustedOrigins: async (request) => {
+    const origin = request?.headers.get("origin");
+    const allowedOrigins2 = [
+      process.env.APP_URL,
+      process.env.BETTER_AUTH_URL,
+      "http://localhost:3000",
+      "http://localhost:4000",
+      "http://localhost:5000",
+      "https://frontend-foodhub-mrashed21.vercel.app",
+      "https://backend-foodhub-mrashed21.vercel.app"
+    ].filter(Boolean);
+    if (!origin || allowedOrigins2.includes(origin) || /^https:\/\/.*\.vercel\.app$/.test(origin)) {
+      return [origin];
+    }
+    return [];
+  },
+  basePath: "/api/auth",
   user: {
     additionalFields: {
       role: {
@@ -2411,8 +2428,104 @@ router6.post(
 );
 var reviewRouter = router6;
 
-// src/modules/user/user.route.ts
+// src/modules/stats/starts.route.ts
 import express6 from "express";
+
+// src/modules/stats/stats.service.ts
+var getStats = async () => {
+  return {
+    totalUsers: await prisma.user.count(),
+    totalProviders: await prisma.user.count({
+      where: { role: "provider" /* provider */ }
+    }),
+    totalCustomers: await prisma.user.count({
+      where: { role: "customer" /* customer */ }
+    }),
+    totalOrders: await prisma.order.count(),
+    totalPendingOrders: await prisma.order.count({
+      where: { status: "placed" }
+    }),
+    totalCompletedOrders: await prisma.order.count({
+      where: { status: "delivered" }
+    }),
+    totalCancelledOrders: await prisma.order.count({
+      where: { status: "cancelled" }
+    }),
+    totalDeliveredOrders: await prisma.order.count({
+      where: { status: "delivered" }
+    }),
+    totalMenus: await prisma.menu.count(),
+    totalCategories: await prisma.category.count(),
+    totalReviews: await prisma.review.count()
+  };
+};
+var getStatsForProvider = async (providerId) => {
+  return {
+    totalOrders: await prisma.order.count({
+      where: { providerId }
+    }),
+    totalPendingOrders: await prisma.order.count({
+      where: { status: "placed", providerId }
+    }),
+    totalCompletedOrders: await prisma.order.count({
+      where: { status: "delivered", providerId }
+    }),
+    totalCancelledOrders: await prisma.order.count({
+      where: { status: "cancelled", providerId }
+    }),
+    totalDeliveredOrders: await prisma.order.count({
+      where: { status: "delivered", providerId }
+    }),
+    totalMenus: await prisma.menu.count({
+      where: { providerId }
+    })
+  };
+};
+var statsService = {
+  getStats,
+  getStatsForProvider
+};
+
+// src/modules/stats/starts.controller.ts
+var getStats2 = async (req, res, next) => {
+  try {
+    const stats = await statsService.getStats();
+    res.status(200).json({
+      success: true,
+      message: "Stats fetched successfully",
+      data: stats
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+var getStatsForProvider2 = async (req, res, next) => {
+  const providerId = req.user?.id;
+  try {
+    const stats = await statsService.getStatsForProvider(providerId);
+    res.status(200).json({
+      success: true,
+      message: "Stats fetched successfully",
+      data: stats
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+var statsController = { getStats: getStats2, getStatsForProvider: getStatsForProvider2 };
+
+// src/modules/stats/starts.route.ts
+var router7 = express6.Router();
+router7.get(
+  "/provider",
+  auth_middleware_default("provider" /* provider */),
+  statsController.getStatsForProvider
+);
+router7.get("/admin", auth_middleware_default("admin" /* admin */), statsController.getStats);
+var statsRouter = router7;
+
+// src/modules/user/user.route.ts
+import express7 from "express";
 
 // src/modules/user/user.service.ts
 var getAllUsers = async ({
@@ -2548,38 +2661,59 @@ var userController = {
 };
 
 // src/modules/user/user.route.ts
-var router7 = express6.Router();
-router7.get("/", auth_middleware_default("admin" /* admin */), userController.getAllUsers);
-router7.patch(
+var router8 = express7.Router();
+router8.get("/", auth_middleware_default("admin" /* admin */), userController.getAllUsers);
+router8.patch(
   "/",
   auth_middleware_default("admin" /* admin */),
   userController.updateUserStatus
 );
-var userRouter = router7;
+var userRouter = router8;
 
 // src/router/router.ts
 import { Router as Router2 } from "express";
-var router8 = Router2();
-router8.use("/category", categoryRouter);
-router8.use("/user", userRouter);
-router8.use("/menu", menuRouter);
-router8.use("/order", orderRouter);
-router8.use("/review", reviewRouter);
-router8.use("/provider", providerRouter);
-router8.use("/profile", profileRouter);
-var router_default = router8;
+var router9 = Router2();
+router9.use("/category", categoryRouter);
+router9.use("/user", userRouter);
+router9.use("/menu", menuRouter);
+router9.use("/order", orderRouter);
+router9.use("/review", reviewRouter);
+router9.use("/provider", providerRouter);
+router9.use("/profile", profileRouter);
+router9.use("/stats", statsRouter);
+var router_default = router9;
 
 // src/app.ts
-var app = express7();
-app.use(express7.json());
+var app = express8();
+app.use(express8.json());
+var allowedOrigins = [
+  process.env.APP_URL || "http://localhost:4000",
+  process.env.PROD_APP_URL,
+  // Production frontend URL
+  "http://localhost:3000",
+  "http://localhost:4000",
+  "https://frontend-foodhub-mrashed21.vercel.app",
+  "https://backend-foodhub-mrashed21.vercel.app"
+].filter(Boolean);
 app.use(
   cors({
-    origin: process.env.APP_ORIGIN,
-    credentials: true
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const isAllowed = allowedOrigins.includes(origin) || /^https:\/\/next-blog-client.*\.vercel\.app$/.test(origin) || /^https:\/\/.*\.vercel\.app$/.test(origin);
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error(`Origin ${origin} not allowed by CORS`));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+    exposedHeaders: ["Set-Cookie"]
   })
 );
-app.use("/api/v1", router_default);
 app.all("/api/auth/*splat", toNodeHandler(auth));
+app.use("/api/v1", router_default);
 app.get("/", (req, res) => {
   res.send("FoodHub server is running");
 });
@@ -2617,4 +2751,5 @@ export {
 //! Update order status / cancel
 //! get  review for homepage
 //! create review
+//! get all stats for provider
 //! update user status
