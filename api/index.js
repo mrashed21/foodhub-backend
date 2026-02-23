@@ -289,22 +289,10 @@ var auth = betterAuth({
     provider: "postgresql"
   }),
   // trustedOrigins: ["https://frontend-foodhub-mrashed21.vercel.app"],
-  trustedOrigins: async (request) => {
-    const origin = request?.headers.get("origin");
-    const allowedOrigins = [
-      process.env.APP_URL,
-      process.env.BETTER_AUTH_URL,
-      "http://localhost:3000",
-      "http://localhost:4000",
-      "http://localhost:5000",
-      "https://frontend-foodhub-mrashed21.vercel.app",
-      "https://backend-foodhub-mrashed21.vercel.app"
-    ].filter(Boolean);
-    if (!origin || allowedOrigins.includes(origin) || /^https:\/\/.*\.vercel\.app$/.test(origin)) {
-      return [origin];
-    }
-    return [];
-  },
+  trustedOrigins: [
+    "https://frontend-foodhub-mrashed21.vercel.app",
+    "http://localhost:3000"
+  ],
   basePath: "/api/auth",
   user: {
     additionalFields: {
@@ -451,61 +439,17 @@ var auth = betterAuth({
       }
     }
   },
-  // advanced: {
-  //   defaultCookieAttributes: {
-  //     sameSite: "none",
-  //     secure: true,
-  //     httpOnly: true,
-  //     //extra
-  //     path: "/",
-  //   },
-  //   trustProxy: true,
-  //   cookies: {
-  //     state: {
-  //       attributes: {
-  //         sameSite: "none",
-  //         secure: true,
-  //         // extra
-  //         path: "/",
-  //       },
-  //     },
-  //   },
-  // },
   advanced: {
-    // disableCSRFCheck: true,
-    useSecureCookies: false,
-    cookies: {
-      state: {
-        attributes: {
-          sameSite: "none",
-          secure: true,
-          httpOnly: true,
-          path: "/"
-        }
-      }
+    cookiePrefix: "better-auth",
+    useSecureCookies: process.env.NODE_ENV === "production",
+    trustProxy: true
+  },
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60
     }
   }
-  // advanced: {
-  //   defaultCookieAttributes: {
-  //     sameSite: "none",
-  //     secure: true,
-  //     httpOnly: true,
-  //     path: "/",
-  //   },
-  //   trustProxy: true,
-  //   cookies: {
-  //     state: {
-  //       attributes: {
-  //         sameSite: "none",
-  //         secure: true,
-  //         path: "/",
-  //         ...(process.env.NODE_ENV === "production" && {
-  //           domain: ".vercel.app",
-  //         }),
-  //       },
-  //     },
-  //   },
-  // },
 });
 
 // src/middleware/error-handler.ts
@@ -2743,17 +2687,25 @@ var router_default = router9;
 var app = express8();
 app.use(express8.json());
 app.set("trust proxy", true);
+var allowedOrigins = [
+  process.env.APP_URL || "http://localhost:3000",
+  process.env.PROD_APP_URL
+].filter(Boolean);
 app.use(
   cors({
-    origin: [
-      "https://frontend-foodhub-mrashed21.vercel.app",
-      "https://backend-foodhub-mrashed21.vercel.app",
-      "http://localhost:3000",
-      "http://localhost:5000"
-    ],
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const isAllowed = allowedOrigins.includes(origin) || /^https:\/\/.*\.vercel\.app$/.test(origin);
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error(`Origin ${origin} not allowed by CORS`));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Cookie"]
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+    exposedHeaders: ["Set-Cookie"]
   })
 );
 app.all("/api/auth/*splat", toNodeHandler(auth));

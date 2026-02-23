@@ -19,30 +19,10 @@ export const auth = betterAuth({
   }),
   // trustedOrigins: ["https://frontend-foodhub-mrashed21.vercel.app"],
 
-  trustedOrigins: async (request) => {
-    const origin = request?.headers.get("origin");
-
-    const allowedOrigins = [
-      process.env.APP_URL,
-      process.env.BETTER_AUTH_URL,
-      "http://localhost:3000",
-      "http://localhost:4000",
-      "http://localhost:5000",
-      "https://frontend-foodhub-mrashed21.vercel.app",
-      "https://backend-foodhub-mrashed21.vercel.app",
-    ].filter(Boolean);
-
-    // Check if origin matches allowed origins or Vercel pattern
-    if (
-      !origin ||
-      allowedOrigins.includes(origin) ||
-      /^https:\/\/.*\.vercel\.app$/.test(origin)
-    ) {
-      return [origin];
-    }
-
-    return [];
-  },
+  trustedOrigins: [
+    "https://frontend-foodhub-mrashed21.vercel.app",
+    "http://localhost:3000",
+  ],
 
   basePath: "/api/auth",
 
@@ -193,61 +173,16 @@ export const auth = betterAuth({
     },
   },
 
-  // advanced: {
-  //   defaultCookieAttributes: {
-  //     sameSite: "none",
-  //     secure: true,
-  //     httpOnly: true,
-  //     //extra
-  //     path: "/",
-  //   },
-  //   trustProxy: true,
-  //   cookies: {
-  //     state: {
-  //       attributes: {
-  //         sameSite: "none",
-  //         secure: true,
-  //         // extra
-  //         path: "/",
-  //       },
-  //     },
-  //   },
-  // },
-
   advanced: {
-    // disableCSRFCheck: true,
-    useSecureCookies: false,
-    cookies: {
-      state: {
-        attributes: {
-          sameSite: "none",
-          secure: true,
-          httpOnly: true,
-          path: "/",
-        },
-      },
-    },
+    cookiePrefix: "better-auth",
+    useSecureCookies: process.env.NODE_ENV === "production",
+    trustProxy: true,
   },
 
-  // advanced: {
-  //   defaultCookieAttributes: {
-  //     sameSite: "none",
-  //     secure: true,
-  //     httpOnly: true,
-  //     path: "/",
-  //   },
-  //   trustProxy: true,
-  //   cookies: {
-  //     state: {
-  //       attributes: {
-  //         sameSite: "none",
-  //         secure: true,
-  //         path: "/",
-  //         ...(process.env.NODE_ENV === "production" && {
-  //           domain: ".vercel.app",
-  //         }),
-  //       },
-  //     },
-  //   },
-  // },
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,
+    },
+  },
 });
