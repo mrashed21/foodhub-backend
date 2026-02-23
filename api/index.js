@@ -291,7 +291,7 @@ var auth = betterAuth({
   // trustedOrigins: ["https://frontend-foodhub-mrashed21.vercel.app"],
   trustedOrigins: async (request) => {
     const origin = request?.headers.get("origin");
-    const allowedOrigins2 = [
+    const allowedOrigins = [
       process.env.APP_URL,
       process.env.BETTER_AUTH_URL,
       "http://localhost:3000",
@@ -300,7 +300,7 @@ var auth = betterAuth({
       "https://frontend-foodhub-mrashed21.vercel.app",
       "https://backend-foodhub-mrashed21.vercel.app"
     ].filter(Boolean);
-    if (!origin || allowedOrigins2.includes(origin) || /^https:\/\/.*\.vercel\.app$/.test(origin)) {
+    if (!origin || allowedOrigins.includes(origin) || /^https:\/\/.*\.vercel\.app$/.test(origin)) {
       return [origin];
     }
     return [];
@@ -450,7 +450,62 @@ var auth = betterAuth({
         throw new Error("Failed to send verification email");
       }
     }
+  },
+  // advanced: {
+  //   defaultCookieAttributes: {
+  //     sameSite: "none",
+  //     secure: true,
+  //     httpOnly: true,
+  //     //extra
+  //     path: "/",
+  //   },
+  //   trustProxy: true,
+  //   cookies: {
+  //     state: {
+  //       attributes: {
+  //         sameSite: "none",
+  //         secure: true,
+  //         // extra
+  //         path: "/",
+  //       },
+  //     },
+  //   },
+  // },
+  advanced: {
+    // disableCSRFCheck: true,
+    useSecureCookies: false,
+    cookies: {
+      state: {
+        attributes: {
+          sameSite: "none",
+          secure: true,
+          httpOnly: true,
+          path: "/"
+        }
+      }
+    }
   }
+  // advanced: {
+  //   defaultCookieAttributes: {
+  //     sameSite: "none",
+  //     secure: true,
+  //     httpOnly: true,
+  //     path: "/",
+  //   },
+  //   trustProxy: true,
+  //   cookies: {
+  //     state: {
+  //       attributes: {
+  //         sameSite: "none",
+  //         secure: true,
+  //         path: "/",
+  //         ...(process.env.NODE_ENV === "production" && {
+  //           domain: ".vercel.app",
+  //         }),
+  //       },
+  //     },
+  //   },
+  // },
 });
 
 // src/middleware/error-handler.ts
@@ -528,6 +583,7 @@ var authMiddleWare = (...role) => {
         role: session.user.role,
         emailVerified: session.user.emailVerified
       };
+      console.log(req.user);
       if (role.length && !role.includes(req.user.role)) {
         return res.status(403).json({
           success: false,
@@ -2686,30 +2742,18 @@ var router_default = router9;
 // src/app.ts
 var app = express8();
 app.use(express8.json());
-var allowedOrigins = [
-  process.env.APP_URL || "http://localhost:4000",
-  process.env.PROD_APP_URL,
-  // Production frontend URL
-  "http://localhost:3000",
-  "http://localhost:4000",
-  "https://frontend-foodhub-mrashed21.vercel.app",
-  "https://backend-foodhub-mrashed21.vercel.app"
-].filter(Boolean);
+app.set("trust proxy", true);
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      const isAllowed = allowedOrigins.includes(origin) || /^https:\/\/next-blog-client.*\.vercel\.app$/.test(origin) || /^https:\/\/.*\.vercel\.app$/.test(origin);
-      if (isAllowed) {
-        callback(null, true);
-      } else {
-        callback(new Error(`Origin ${origin} not allowed by CORS`));
-      }
-    },
+    origin: [
+      "https://frontend-foodhub-mrashed21.vercel.app",
+      "https://backend-foodhub-mrashed21.vercel.app",
+      "http://localhost:3000",
+      "http://localhost:5000"
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
-    exposedHeaders: ["Set-Cookie"]
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"]
   })
 );
 app.all("/api/auth/*splat", toNodeHandler(auth));

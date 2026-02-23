@@ -178,7 +178,7 @@ const getAllCategoriesForAdmin = async ({
 // ! update category service
 const updateCategory = async (
   data: Partial<
-    Omit<Category, "id" | "createdAt" | "updatedAt" | "published_by">
+    Omit<Category, "id" | "createdAt" | "updatedAt" | "publishedBy">
   >,
   id: string,
 ) => {

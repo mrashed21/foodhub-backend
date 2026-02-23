@@ -193,24 +193,61 @@ export const auth = betterAuth({
     },
   },
 
+  // advanced: {
+  //   defaultCookieAttributes: {
+  //     sameSite: "none",
+  //     secure: true,
+  //     httpOnly: true,
+  //     //extra
+  //     path: "/",
+  //   },
+  //   trustProxy: true,
+  //   cookies: {
+  //     state: {
+  //       attributes: {
+  //         sameSite: "none",
+  //         secure: true,
+  //         // extra
+  //         path: "/",
+  //       },
+  //     },
+  //   },
+  // },
+
   advanced: {
-    defaultCookieAttributes: {
-      sameSite: "none",
-      secure: true,
-      httpOnly: true,
-      //extra
-      path: "/",
-    },
-    trustProxy: true,
+    // disableCSRFCheck: true,
+    useSecureCookies: false,
     cookies: {
       state: {
         attributes: {
           sameSite: "none",
           secure: true,
-          // extra
+          httpOnly: true,
           path: "/",
         },
       },
     },
   },
+
+  // advanced: {
+  //   defaultCookieAttributes: {
+  //     sameSite: "none",
+  //     secure: true,
+  //     httpOnly: true,
+  //     path: "/",
+  //   },
+  //   trustProxy: true,
+  //   cookies: {
+  //     state: {
+  //       attributes: {
+  //         sameSite: "none",
+  //         secure: true,
+  //         path: "/",
+  //         ...(process.env.NODE_ENV === "production" && {
+  //           domain: ".vercel.app",
+  //         }),
+  //       },
+  //     },
+  //   },
+  // },
 });
